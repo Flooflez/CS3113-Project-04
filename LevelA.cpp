@@ -87,6 +87,8 @@ void LevelA::initialise()
     m_state.enemies[0].set_movement(glm::vec3(0.0f));
     m_state.enemies[0].set_speed(0.5f);
     m_state.enemies[0].set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    m_state.enemies[0].m_projectile_texture_id = Utility::load_texture("assets/images/projectile.png");
     
     
     /**

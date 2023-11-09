@@ -31,6 +31,7 @@ private:
     EntityType m_entity_type;
     AIType     m_ai_type;
     AIState    m_ai_state;
+    Entity*    m_projectile_pointer = nullptr;
 
     float m_width = 1;
     float m_height = 1;
@@ -102,10 +103,10 @@ public:
     void ai_jump(Entity* player, float delta_time);
     void ai_shoot(Entity* player, float delta_time);
 
+    void shoot_projectile(glm::vec3 direction, float speed);
+
     void activate() { m_is_active = true; };
     void deactivate() { m_is_active = false; };
-
-    void shoot_projectile(glm::vec3 velocity);
 
     // ————— GETTERS ————— //
     EntityType const get_entity_type()    const { return m_entity_type;     };

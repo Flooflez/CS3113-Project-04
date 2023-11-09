@@ -12,6 +12,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "ShaderProgram.h"
 #include "Entity.h"
+#include "Utility.h"
 
 Entity::Entity()
 {
@@ -106,6 +107,10 @@ void Entity::ai_float(Entity* player, float delta_time)
             m_ai_state = ATTACKING;
             m_movement = glm::vec3(0.0f);
             m_attack_timer = 0.0f;
+
+            //make projectile
+            shoot_projectile(glm::vec3(0.0f,-1.0f,0.0f), 0.5f);
+            
             return;
         }
 
@@ -120,14 +125,15 @@ void Entity::ai_float(Entity* player, float delta_time)
         break;
 
     case ATTACKING:
-        if (glm::abs(m_position.x - player->get_position().x) > 0.1f) {
+        if (glm::abs(m_position.x - player->get_position().x) > 0.3f) {
             m_ai_state = WALKING;
             return;
         }
 
         m_attack_timer += delta_time;
         if (m_attack_timer > 1.0f) {
-
+            delete m_projectile_pointer;
+            shoot_projectile(glm::vec3(0.0f, -1.0f, 0.0f), 0.5f);
         }
 
     default:
@@ -164,6 +170,15 @@ void Entity::ai_shoot(Entity* player, float delta_time)
     default:
         break;
     }
+}
+
+void Entity::shoot_projectile(glm::vec3 direction, float speed)
+{
+    m_projectile_pointer = new Entity();
+    m_projectile_pointer->m_texture_id = m_projectile_texture_id;
+    m_projectile_pointer->set_speed(speed);
+    m_projectile_pointer->set_movement(direction);
+    m_projectile_pointer->set_position(m_position);
 }
 
 
