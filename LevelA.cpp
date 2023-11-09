@@ -78,7 +78,6 @@ void LevelA::initialise()
     m_state.enemies[0].m_animation_cols = 4;
     m_state.enemies[0].m_animation_rows = 4;
     
-    
     m_state.enemies[0].set_entity_type(ENEMY);
     m_state.enemies[0].set_ai_type(FLOATER);
     m_state.enemies[0].set_ai_state(IDLE);
@@ -121,5 +120,6 @@ void LevelA::render(ShaderProgram *program)
     for (int i = 0; i < ENEMY_COUNT; i++)
     {
         m_state.enemies[i].render(program);
+        m_state.enemies[i].render_projectile(program);
     }
 }

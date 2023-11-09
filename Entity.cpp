@@ -103,13 +103,14 @@ void Entity::ai_float(Entity* player, float delta_time)
         break;
 
     case WALKING:
-        if (glm::abs(m_position.x - player->get_position().x) < 0.01f) {
+        if (glm::abs(m_position.x - player->get_position().x) < 0.5f) {
             m_ai_state = ATTACKING;
             m_movement = glm::vec3(0.0f);
             m_attack_timer = 0.0f;
 
             //make projectile
-            shoot_projectile(glm::vec3(0.0f,-1.0f,0.0f), 0.5f);
+            
+            shoot_projectile(glm::normalize(player->get_position() - m_position), 1.0f, glm::vec3(0.25f), glm::vec3(0.25f));
             
             return;
         }
@@ -125,15 +126,16 @@ void Entity::ai_float(Entity* player, float delta_time)
         break;
 
     case ATTACKING:
-        if (glm::abs(m_position.x - player->get_position().x) > 0.3f) {
+        if (glm::abs(m_position.x - player->get_position().x) > 1.0f) {
             m_ai_state = WALKING;
             return;
         }
 
         m_attack_timer += delta_time;
-        if (m_attack_timer > 1.0f) {
+        if (m_attack_timer > 3.0f) {
             delete m_projectile_pointer;
-            shoot_projectile(glm::vec3(0.0f, -1.0f, 0.0f), 0.5f);
+            shoot_projectile(glm::normalize(player->get_position() - m_position), 1.0f, glm::vec3(0.25f), glm::vec3(0.25f));
+            m_attack_timer = 0;
         }
 
     default:
@@ -172,13 +174,16 @@ void Entity::ai_shoot(Entity* player, float delta_time)
     }
 }
 
-void Entity::shoot_projectile(glm::vec3 direction, float speed)
+void Entity::shoot_projectile(glm::vec3 direction, float speed, glm::vec3 scale, glm::vec3 size)
 {
     m_projectile_pointer = new Entity();
     m_projectile_pointer->m_texture_id = m_projectile_texture_id;
     m_projectile_pointer->set_speed(speed);
     m_projectile_pointer->set_movement(direction);
     m_projectile_pointer->set_position(m_position);
+    m_projectile_pointer->set_scale(scale);
+    m_projectile_pointer->set_height(size.y);
+    m_projectile_pointer->set_width(size.x);
 }
 
 
@@ -192,6 +197,10 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
     m_collided_right = false;
 
     if (m_entity_type == ENEMY) ai_activate(player, delta_time);
+
+    if (m_projectile_pointer != nullptr) {
+        m_projectile_pointer->update(delta_time, player, objects, object_count, map);
+    }
 
     if (m_animation_indices != NULL)
     {
@@ -213,16 +222,15 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
         }
     }
 
-    m_velocity.x = m_movement.x * m_speed;
     m_velocity += m_acceleration * delta_time;
 
     // We make two calls to our check_collision methods, one for the collidable objects and one for
     // the map.
-    m_position.y += m_velocity.y * delta_time;
+    m_position.y += (m_velocity.y + (m_movement.y * m_speed)) * delta_time;
     check_collision_y(objects, object_count);
     check_collision_y(map);
 
-    m_position.x += m_velocity.x * delta_time;
+    m_position.x += (m_velocity.x + (m_movement.x * m_speed)) * delta_time;
     check_collision_x(objects, object_count);
     check_collision_x(map);
 
@@ -235,6 +243,7 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
 
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_position);
+    m_model_matrix = glm::scale(m_model_matrix, m_scale);
 }
 
 void const Entity::check_collision_y(Entity* collidable_entities, int collidable_entity_count)
@@ -366,7 +375,11 @@ void const Entity::check_collision_x(Map* map)
     }
 }
 
-
+void Entity::render_projectile(ShaderProgram* program) {
+    if (m_projectile_pointer != nullptr) {
+        m_projectile_pointer->render(program);
+    }
+}
 
 void Entity::render(ShaderProgram* program)
 {

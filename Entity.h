@@ -25,6 +25,7 @@ private:
     float     m_speed;
     glm::vec3 m_movement;
     glm::mat4 m_model_matrix;
+    glm::vec3 m_scale = glm::vec3(1.0f);
 
 
     // ————— ENEMY AI ————— //
@@ -84,6 +85,7 @@ public:
     void draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint texture_id, int index);
     void update(float delta_time, Entity* player, Entity* objects, int object_count, Map* map); // Now, update should check for both objects in the game AND the map
     void render(ShaderProgram* program);
+    void render_projectile(ShaderProgram* program);
 
     bool const check_collision(Entity* other) const;
     void const check_collision_y(Entity* collidable_entities, int collidable_entity_count);
@@ -92,6 +94,7 @@ public:
     // Overloading our methods to check for only the map
     void const check_collision_y(Map* map);
     void const check_collision_x(Map* map);
+
 
     void move_left()    { m_movement.x = -1.0f; };
     void move_right()   { m_movement.x = 1.0f; };
@@ -103,7 +106,7 @@ public:
     void ai_jump(Entity* player, float delta_time);
     void ai_shoot(Entity* player, float delta_time);
 
-    void shoot_projectile(glm::vec3 direction, float speed);
+    void shoot_projectile(glm::vec3 direction, float speed, glm::vec3 scale, glm::vec3 size);
 
     void activate() { m_is_active = true; };
     void deactivate() { m_is_active = false; };
@@ -116,6 +119,7 @@ public:
     glm::vec3  const get_movement()       const { return m_movement;        };
     glm::vec3  const get_velocity()       const { return m_velocity;        };
     glm::vec3  const get_acceleration()   const { return m_acceleration;    };
+    glm::vec3  const get_scale()          const { return m_scale; };
     float      const get_jumping_power()  const { return m_jumping_power;   };
     float      const get_speed()          const { return m_speed;           };
     int        const get_width()          const { return m_width;           };
@@ -130,6 +134,7 @@ public:
     void const set_velocity(glm::vec3 new_velocity)         { m_velocity = new_velocity;            };
     void const set_speed(float new_speed)                   { m_speed = new_speed;                  };
     void const set_jumping_power(float new_jumping_power)   { m_jumping_power = new_jumping_power;  };
+    void const set_scale(glm::vec3 new_scale) { m_scale = new_scale; };
     void const set_acceleration(glm::vec3 new_acceleration) { m_acceleration = new_acceleration;    };
     void const set_width(float new_width)                   { m_width = new_width;                  };
     void const set_height(float new_height)                 { m_height = new_height;                };
