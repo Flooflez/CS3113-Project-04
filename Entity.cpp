@@ -19,6 +19,7 @@ Entity::Entity()
     // ––––– PHYSICS ––––– //
     m_position = glm::vec3(0.0f);
     m_velocity = glm::vec3(0.0f);
+    m_base_velocity = glm::vec3(0.0f);
     m_acceleration = glm::vec3(0.0f);
 
     // ––––– TRANSLATION ––––– //
@@ -75,6 +76,17 @@ void Entity::draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint textu
     glDisableVertexAttribArray(program->get_tex_coordinate_attribute());
 }
 
+void Entity::activate() { 
+    m_is_active = true; 
+    if (m_projectile_pointer != nullptr) {
+        delete m_projectile_pointer;
+        m_projectile_pointer = nullptr;
+    }
+};
+void Entity::deactivate() { 
+    m_is_active = false; 
+};
+
 void Entity::ai_activate(Entity* player, float delta_time)
 {
     switch (m_ai_type)
@@ -108,11 +120,6 @@ void Entity::ai_float(Entity* player, float delta_time)
             m_ai_state = ATTACKING;
             m_movement = glm::vec3(0.0f);
             m_attack_timer = 0.0f;
-
-            //make projectile
-            
-            shoot_projectile(glm::normalize(player->get_position() - m_position), 1.0f, glm::vec3(0.25f), glm::vec3(0.25f));
-            
             return;
         }
 
@@ -223,14 +230,15 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
         }
     }
 
-    m_velocity += m_acceleration * delta_time;
+    m_base_velocity += m_acceleration * delta_time;
+    m_velocity = m_base_velocity + (m_movement * m_speed);
 
     // We make two calls to our check_collision methods, one for the collidable objects and one for
     // the map.
-    m_position.y += (m_velocity.y + (m_movement.y * m_speed)) * delta_time;
+    m_position.y += m_velocity.y * delta_time;
     check_collision_y(objects, object_count);
     check_collision_y(map);
-    m_position.x += (m_velocity.x + (m_movement.x * m_speed)) * delta_time;
+    m_position.x += m_velocity.x * delta_time;
     check_collision_x(objects, object_count);
     check_collision_x(map);
 
@@ -239,7 +247,7 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
     {
         m_is_jumping = false;
 
-        m_velocity.y += m_jumping_power;
+        m_base_velocity.y += m_jumping_power;
     }
 
     m_model_matrix = glm::mat4(1.0f);
@@ -256,6 +264,7 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
         if (check_collision(collidable_entity))
         {
             if (m_velocity.y > 0) {
+                std::cout << "popped";
                 collidable_entity->deactivate();
             }
             else if (m_velocity.y < 0) {
@@ -303,19 +312,19 @@ void const Entity::check_collision_y(Map* map)
     if (map->is_solid(top, &penetration_x, &penetration_y) && m_velocity.y > 0)
     {
         m_position.y -= penetration_y;
-        m_velocity.y = 0;
+        m_base_velocity.y = 0;
         m_collided_top = true;
     }
     else if (map->is_solid(top_left, &penetration_x, &penetration_y) && m_velocity.y > 0)
     {
         m_position.y -= penetration_y;
-        m_velocity.y = 0;
+        m_base_velocity.y = 0;
         m_collided_top = true;
     }
     else if (map->is_solid(top_right, &penetration_x, &penetration_y) && m_velocity.y > 0)
     {
         m_position.y -= penetration_y;
-        m_velocity.y = 0;
+        m_base_velocity.y = 0;
         m_collided_top = true;
     }
 
@@ -323,19 +332,19 @@ void const Entity::check_collision_y(Map* map)
     if (map->is_solid(bottom, &penetration_x, &penetration_y) && m_velocity.y < 0)
     {
         m_position.y += penetration_y;
-        m_velocity.y = 0;
+        m_base_velocity.y = 0;
         m_collided_bottom = true;
     }
     else if (map->is_solid(bottom_left, &penetration_x, &penetration_y) && m_velocity.y < 0)
     {
         m_position.y += penetration_y;
-        m_velocity.y = 0;
+        m_base_velocity.y = 0;
         m_collided_bottom = true;
     }
     else if (map->is_solid(bottom_right, &penetration_x, &penetration_y) && m_velocity.y < 0)
     {
         m_position.y += penetration_y;
-        m_velocity.y = 0;
+        m_base_velocity.y = 0;
         m_collided_bottom = true;
 
     }
@@ -353,13 +362,13 @@ void const Entity::check_collision_x(Map* map)
     if (map->is_solid(left, &penetration_x, &penetration_y) && m_velocity.x < 0)
     {
         m_position.x += penetration_x;
-        m_velocity.x = 0;
+        m_base_velocity.x = 0;
         m_collided_left = true;
     }
     if (map->is_solid(right, &penetration_x, &penetration_y) && m_velocity.x > 0)
     {
         m_position.x -= penetration_x;
-        m_velocity.x = 0;
+        m_base_velocity.x = 0;
         m_collided_right = true;
     }
 }

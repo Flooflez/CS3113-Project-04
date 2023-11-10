@@ -95,7 +95,7 @@ bool Map::is_solid(glm::vec3 position, float *penetration_x, float *penetration_
     // inb4: we're passing by reference
     *penetration_x = 0;
     *penetration_y = 0;
-    
+
     // If we are out of bounds, it is not solid
     if (position.x < m_left_bound || position.x > m_right_bound)  return false;
     if (position.y > m_top_bound  || position.y < m_bottom_bound) return false;
@@ -118,7 +118,7 @@ bool Map::is_solid(glm::vec3 position, float *penetration_x, float *penetration_
     // And because we likely have some overlap, we adjust for that
     *penetration_x = (m_tile_size / 2) - fabs(position.x - tile_center_x);
     *penetration_y = (m_tile_size / 2) - fabs(position.y - tile_center_y);
-    std::cout << *penetration_x << " " << *penetration_y << std::endl;
+    //std::cout << *penetration_x << " " << *penetration_y << std::endl;
     
     return true;
 }

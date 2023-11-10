@@ -18,7 +18,7 @@ private:
 
     // ––––– PHYSICS (GRAVITY) ––––– //
     glm::vec3 m_position;
-    glm::vec3 m_velocity;
+    glm::vec3 m_velocity, m_base_velocity;
     glm::vec3 m_acceleration;
 
     // ————— TRANSFORMATIONS ————— //
@@ -109,8 +109,8 @@ public:
 
     void shoot_projectile(glm::vec3 direction, float speed, glm::vec3 scale, glm::vec3 size);
 
-    void activate() { m_is_active = true; };
-    void deactivate() { m_is_active = false; };
+    void activate();
+    void deactivate();
 
 
     // ————— GETTERS ————— //
