@@ -29,6 +29,7 @@ Entity::Entity()
 
 Entity::~Entity()
 {
+    delete m_projectile_pointer;
     delete[] m_animation_up;
     delete[] m_animation_down;
     delete[] m_animation_left;
@@ -229,10 +230,10 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
     m_position.y += (m_velocity.y + (m_movement.y * m_speed)) * delta_time;
     check_collision_y(objects, object_count);
     check_collision_y(map);
-
     m_position.x += (m_velocity.x + (m_movement.x * m_speed)) * delta_time;
     check_collision_x(objects, object_count);
     check_collision_x(map);
+
 
     if (m_is_jumping)
     {
@@ -254,17 +255,11 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
 
         if (check_collision(collidable_entity))
         {
-            float y_distance = fabs(m_position.y - collidable_entity->get_position().y);
-            float y_overlap = fabs(y_distance - (m_height / 2.0f) - (collidable_entity->get_height() / 2.0f));
             if (m_velocity.y > 0) {
-                m_position.y -= y_overlap;
-                m_velocity.y = 0;
-                m_collided_top = true;
+                collidable_entity->deactivate();
             }
             else if (m_velocity.y < 0) {
-                m_position.y += y_overlap;
-                m_velocity.y = 0;
-                m_collided_bottom = true;
+                deactivate();
             }
         }
     }
@@ -278,17 +273,11 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
 
         if (check_collision(collidable_entity))
         {
-            float x_distance = fabs(m_position.x - collidable_entity->get_position().x);
-            float x_overlap = fabs(x_distance - (m_width / 2.0f) - (collidable_entity->get_width() / 2.0f));
             if (m_velocity.x > 0) {
-                m_position.x -= x_overlap;
-                m_velocity.x = 0;
-                m_collided_right = true;
+                deactivate();
             }
             else if (m_velocity.x < 0) {
-                m_position.x += x_overlap;
-                m_velocity.x = 0;
-                m_collided_left = true;
+                deactivate();
             }
         }
     }
@@ -383,6 +372,8 @@ void Entity::render_projectile(ShaderProgram* program) {
 
 void Entity::render(ShaderProgram* program)
 {
+    if (!m_is_active) return;
+
     program->set_model_matrix(m_model_matrix);
 
     if (m_animation_indices != NULL)

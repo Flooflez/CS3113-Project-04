@@ -41,7 +41,12 @@ const int   VIEWPORT_X = 0,
 const char  V_SHADER_PATH[] = "shaders/vertex_textured.glsl",
             F_SHADER_PATH[] = "shaders/fragment_textured.glsl";
 
+const char  FONT_FILEPATH[] = "assets/images/font1.png";
+
 const float MILLISECONDS_IN_SECOND = 1000.0;
+
+const std::string DEATH_MESSAGE = "YOU LOST! BETTER LUCK NEXT TIME!",
+                  WIN_MESSAGE   = "CONGRATS! YOU POPPED THEM ALL!!";
 
 // ————— GLOBAL VARIABLES ————— //
 Scene*  g_current_scene;
@@ -49,12 +54,28 @@ LevelA* g_level_a;
 
 SDL_Window* g_display_window;
 bool g_game_is_running = true;
+bool g_game_over = false;
+bool g_game_win = false;
+std::string g_display_message;
 
 ShaderProgram g_shader_program;
 glm::mat4 g_view_matrix, g_projection_matrix;
 
 float g_previous_ticks  = 0.0f;
 float g_accumulator     = 0.0f;
+
+GLuint g_text_texture_id;
+
+void lose_game() {
+    g_game_over = true;
+    g_display_message = DEATH_MESSAGE;
+}
+
+void win_game() {
+    g_game_over = true;
+    g_display_message = WIN_MESSAGE;
+}
+
 
 void switch_to_scene(Scene* scene)
 {
@@ -100,6 +121,10 @@ void initialise()
     // ————— BLENDING ————— //
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // ----- TEXT ----- //
+    g_text_texture_id = Utility::load_texture(FONT_FILEPATH);
+    g_display_message = WIN_MESSAGE;
 }
 
 void process_input()
@@ -192,11 +217,30 @@ void update()
     // ————— PLAYER CAMERA ————— //
     g_view_matrix = glm::mat4(1.0f);
 
-    if (g_current_scene->m_state.player->get_position().x > LEVEL1_LEFT_EDGE) {
+    if (g_current_scene->get_state().player->get_position().x > LEVEL1_LEFT_EDGE) {
             g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-g_current_scene->m_state.player->get_position().x, 3.75, 0));
         } else {
             g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-5, 3.75, 0));
         }
+
+    if (!g_game_over) {
+        int active_count = 0;
+        for (size_t i = 0; i < g_current_scene->get_number_of_enemies(); i++) {
+            if (g_current_scene->get_state().enemies[i].get_active()) {
+                active_count += 1;
+            }
+        }
+        if (active_count == 0) {
+            win_game();
+            std::cout << "win?";
+        }
+
+        if (!g_current_scene->get_state().player->get_active()) {
+            lose_game();
+            std::cout << "lose!";
+        }
+    }
+    
 }
 
 void render()
@@ -207,6 +251,12 @@ void render()
 
     // ————— RENDERING THE SCENE (i.e. map, character, enemies...) ————— //
     g_current_scene->render(&g_shader_program);
+
+    // ----- TEXT ----- //
+    if (g_game_over) {
+        Utility::draw_text(&g_shader_program, g_text_texture_id, g_display_message, 0.25f, 0.0f, glm::vec3(-4.5f, 2.0f, 0.0f));
+    }
+
 
     SDL_GL_SwapWindow(g_display_window);
 }

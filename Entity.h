@@ -88,6 +88,7 @@ public:
     void render_projectile(ShaderProgram* program);
 
     bool const check_collision(Entity* other) const;
+    
     void const check_collision_y(Entity* collidable_entities, int collidable_entity_count);
     void const check_collision_x(Entity* collidable_entities, int collidable_entity_count);
 
@@ -111,6 +112,7 @@ public:
     void activate() { m_is_active = true; };
     void deactivate() { m_is_active = false; };
 
+
     // ————— GETTERS ————— //
     EntityType const get_entity_type()    const { return m_entity_type;     };
     AIType     const get_ai_type()        const { return m_ai_type;         };
@@ -119,11 +121,12 @@ public:
     glm::vec3  const get_movement()       const { return m_movement;        };
     glm::vec3  const get_velocity()       const { return m_velocity;        };
     glm::vec3  const get_acceleration()   const { return m_acceleration;    };
-    glm::vec3  const get_scale()          const { return m_scale; };
+    glm::vec3  const get_scale()          const { return m_scale;           };
     float      const get_jumping_power()  const { return m_jumping_power;   };
     float      const get_speed()          const { return m_speed;           };
     int        const get_width()          const { return m_width;           };
     int        const get_height()         const { return m_height;          };
+    bool       const get_active()         const { return m_is_active;       };
 
     // ————— SETTERS ————— //
     void const set_entity_type(EntityType new_entity_type)  { m_entity_type = new_entity_type;      };
