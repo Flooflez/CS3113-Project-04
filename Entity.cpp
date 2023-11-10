@@ -264,11 +264,11 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
         if (check_collision(collidable_entity))
         {
             if (m_velocity.y > 0) {
-                std::cout << "popped";
-                collidable_entity->deactivate();
+                deactivate();
             }
             else if (m_velocity.y < 0) {
-                deactivate();
+                std::cout << "popped";
+                collidable_entity->deactivate();
             }
         }
     }

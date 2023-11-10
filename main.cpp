@@ -232,12 +232,10 @@ void update()
         }
         if (active_count == 0) {
             win_game();
-            std::cout << "win?";
         }
 
         if (!g_current_scene->get_state().player->get_active()) {
             lose_game();
-            std::cout << "lose!";
         }
     }
     
@@ -254,8 +252,15 @@ void render()
 
     // ----- TEXT ----- //
     if (g_game_over) {
-        Utility::draw_text(&g_shader_program, g_text_texture_id, g_display_message, 0.25f, 0.0f, glm::vec3(-4.5f, 2.0f, 0.0f));
+        if (g_current_scene->get_state().player->get_position().x > LEVEL1_LEFT_EDGE) {
+            Utility::draw_text(&g_shader_program, g_text_texture_id, g_display_message, 1.0f, 0.0f, glm::vec3(-g_current_scene->m_state.player->get_position().x, 3.75, 0));
+        }
+        else {
+            Utility::draw_text(&g_shader_program, g_text_texture_id, g_display_message, 1.0f, 0.0f, glm::vec3(-5, 3.75, 0));
+        }
+        
     }
+    Utility::draw_text(&g_shader_program, g_text_texture_id, std::string("ALLO MATES"), 0.5f, 0.0f, glm::vec3(-5, 3.75, 0));
 
 
     SDL_GL_SwapWindow(g_display_window);
