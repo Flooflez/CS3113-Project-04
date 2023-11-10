@@ -6,14 +6,14 @@
 
 unsigned int LEVEL_DATA[] =
 {
-    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    3, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0,
-    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
-    3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
-    3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
+    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
+    3, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 3,
+    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3,
+    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 3,
+    3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 3,
+    3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3,
+    3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3,
 };
 
 LevelA::~LevelA()
@@ -56,7 +56,7 @@ void LevelA::initialise()
     m_state.player->m_animation_cols   = 4;
     m_state.player->m_animation_rows   = 4;
     m_state.player->set_height(0.8f);
-    m_state.player->set_width(0.8f);
+    m_state.player->set_width(0.6f);
     
     // Jumping
     m_state.player->m_jumping_power = 5.0f;
@@ -66,7 +66,7 @@ void LevelA::initialise()
 
     m_state.enemies = new Entity[ENEMY_COUNT];
 
-    // Walking
+    //enemy 1
     m_state.enemies[0].m_walking[m_state.enemies[0].LEFT] = new int[4] { 1, 5, 9, 13 };
     m_state.enemies[0].m_walking[m_state.enemies[0].RIGHT] = new int[4] { 3, 7, 11, 15 };
     m_state.enemies[0].m_walking[m_state.enemies[0].UP] = new int[4] { 2, 6, 10, 14 };
@@ -85,9 +85,36 @@ void LevelA::initialise()
     m_state.enemies[0].set_position(glm::vec3(1.0f, -3.0f, 0.0f));
     m_state.enemies[0].set_movement(glm::vec3(0.0f));
     m_state.enemies[0].set_speed(0.5f);
+    m_state.enemies[0].set_width(0.6f);
+    m_state.enemies[0].set_height(0.8f);
     m_state.enemies[0].set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
 
     m_state.enemies[0].m_projectile_texture_id = Utility::load_texture("assets/images/projectile.png");
+
+
+    //enemy 2
+    m_state.enemies[1].m_walking[m_state.enemies[1].LEFT] = new int[4] { 1, 5, 9, 13 };
+    m_state.enemies[1].m_walking[m_state.enemies[1].RIGHT] = new int[4] { 3, 7, 11, 15 };
+    m_state.enemies[1].m_walking[m_state.enemies[1].UP] = new int[4] { 2, 6, 10, 14 };
+    m_state.enemies[1].m_walking[m_state.enemies[1].DOWN] = new int[4] { 0, 4, 8, 12 };
+    m_state.enemies[1].m_animation_indices = m_state.enemies[1].m_walking[m_state.enemies[1].RIGHT];  // start enemy looking left
+    m_state.enemies[1].m_animation_frames = 4;
+    m_state.enemies[1].m_animation_index = 0;
+    m_state.enemies[1].m_animation_time = 0.0f;
+    m_state.enemies[1].m_animation_cols = 4;
+    m_state.enemies[1].m_animation_rows = 4;
+
+    m_state.enemies[1].set_entity_type(ENEMY);
+    m_state.enemies[1].set_ai_type(JUMPER);
+    m_state.enemies[1].set_ai_state(ATTACKING);
+    m_state.enemies[1].m_texture_id = Utility::load_texture("assets/images/jumper.png");
+    m_state.enemies[1].set_position(glm::vec3(2.0f, -4.0f, 0.0f));
+    m_state.enemies[1].set_movement(glm::vec3(0.0f));
+    m_state.enemies[1].set_speed(2.0f);
+    m_state.enemies[1].set_width(0.6f);
+    m_state.enemies[1].set_height(0.8f);
+    m_state.enemies[1].set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    m_state.enemies[1].m_jumping_power = 5.0f;
     
     
     /**

@@ -37,7 +37,7 @@ struct GameState
 class Scene {
 public:
     // ————— ATTRIBUTES ————— //
-    int m_number_of_enemies = 1;
+    int m_number_of_enemies = 2;
     
     GameState m_state;
     

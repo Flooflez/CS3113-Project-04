@@ -37,7 +37,7 @@ private:
     float m_width = 1;
     float m_height = 1;
 
-    float m_attack_timer;
+    float m_attack_timer = 0.0f;
 
 
 public:

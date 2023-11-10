@@ -218,10 +218,11 @@ void update()
     g_view_matrix = glm::mat4(1.0f);
 
     if (g_current_scene->get_state().player->get_position().x > LEVEL1_LEFT_EDGE) {
-            g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-g_current_scene->m_state.player->get_position().x, 3.75, 0));
-        } else {
-            g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-5, 3.75, 0));
-        }
+        g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-g_current_scene->m_state.player->get_position().x, 3.75, 0));
+    }
+    else {
+        g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-5, 3.75, 0));
+    }
 
     if (!g_game_over) {
         int active_count = 0;
@@ -253,15 +254,13 @@ void render()
     // ----- TEXT ----- //
     if (g_game_over) {
         if (g_current_scene->get_state().player->get_position().x > LEVEL1_LEFT_EDGE) {
-            Utility::draw_text(&g_shader_program, g_text_texture_id, g_display_message, 1.0f, 0.0f, glm::vec3(-g_current_scene->m_state.player->get_position().x, 3.75, 0));
+            Utility::draw_text(&g_shader_program, g_text_texture_id, g_display_message, 0.4f, -0.1f, glm::vec3(g_current_scene->m_state.player->get_position().x - 4.5f, -0.75f, 0));
         }
         else {
-            Utility::draw_text(&g_shader_program, g_text_texture_id, g_display_message, 1.0f, 0.0f, glm::vec3(-5, 3.75, 0));
+            Utility::draw_text(&g_shader_program, g_text_texture_id, g_display_message, 0.4f, -0.1f, glm::vec3(0.5167255f, -0.75f, 0));
         }
         
     }
-    Utility::draw_text(&g_shader_program, g_text_texture_id, std::string("ALLO MATES"), 0.5f, 0.0f, glm::vec3(-5, 3.75, 0));
-
 
     SDL_GL_SwapWindow(g_display_window);
 }

@@ -140,7 +140,7 @@ void Entity::ai_float(Entity* player, float delta_time)
         }
 
         m_attack_timer += delta_time;
-        if (m_attack_timer > 3.0f) {
+        if (m_attack_timer > 2.0f) {
             delete m_projectile_pointer;
             shoot_projectile(glm::normalize(player->get_position() - m_position), 1.0f, glm::vec3(0.25f), glm::vec3(0.25f));
             m_attack_timer = 0;
@@ -153,7 +153,34 @@ void Entity::ai_float(Entity* player, float delta_time)
 
 void Entity::ai_jump(Entity* player, float delta_time)
 {
-    m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+    m_attack_timer += delta_time;
+    if (m_attack_timer > 3.0f) {
+        float dir = 1.0f;
+        if (m_position.x > player->get_position().x) {
+            dir = -1.0f;
+            m_animation_indices = m_walking[LEFT];
+        }
+        else {
+            m_animation_indices = m_walking[RIGHT];
+        }
+
+        float player_distance = m_position.x - player->get_position().x;
+
+        if (glm::abs(player_distance) > 1.0f) {
+            m_base_velocity.y = m_jumping_power;
+            m_movement = glm::vec3(dir, 0.0f,0.0f);
+            m_speed = 2.0f;
+        }
+        else {
+            m_base_velocity.y = m_jumping_power;
+            m_movement = glm::vec3(dir, 0.0f, 0.0f);
+            m_speed = 1.0f;
+        }
+        m_attack_timer = 0;
+    }
+    else if (m_collided_bottom) {
+        m_movement = glm::vec3(0.0f);
+    }
 }
 
 void Entity::ai_shoot(Entity* player, float delta_time)
@@ -199,12 +226,14 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
 {
     if (!m_is_active) return;
 
+
+    if (m_entity_type == ENEMY) ai_activate(player, delta_time);
     m_collided_top = false;
     m_collided_bottom = false;
     m_collided_left = false;
     m_collided_right = false;
 
-    if (m_entity_type == ENEMY) ai_activate(player, delta_time);
+    
 
     if (m_projectile_pointer != nullptr) {
         m_projectile_pointer->update(delta_time, player, objects, object_count, map);
@@ -215,7 +244,7 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
         if (glm::length(m_movement) != 0)
         {
             m_animation_time += delta_time;
-            float frames_per_second = (float)1 / SECONDS_PER_FRAME;
+            float frames_per_second = 1.0f / SECONDS_PER_FRAME;
 
             if (m_animation_time >= frames_per_second)
             {
@@ -235,12 +264,13 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
 
     // We make two calls to our check_collision methods, one for the collidable objects and one for
     // the map.
-    m_position.y += m_velocity.y * delta_time;
-    check_collision_y(objects, object_count);
-    check_collision_y(map);
     m_position.x += m_velocity.x * delta_time;
     check_collision_x(objects, object_count);
     check_collision_x(map);
+    m_position.y += m_velocity.y * delta_time;
+    check_collision_y(objects, object_count);
+    check_collision_y(map);
+    
 
 
     if (m_is_jumping)
@@ -263,12 +293,12 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
 
         if (check_collision(collidable_entity))
         {
-            if (m_velocity.y > 0) {
+            if (m_velocity.y >= 0) {
                 deactivate();
             }
             else if (m_velocity.y < 0) {
-                std::cout << "popped";
                 collidable_entity->deactivate();
+                m_base_velocity.y = m_jumping_power/2.0f; //mini jump when stomping
             }
         }
     }
@@ -282,12 +312,7 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
 
         if (check_collision(collidable_entity))
         {
-            if (m_velocity.x > 0) {
-                deactivate();
-            }
-            else if (m_velocity.x < 0) {
-                deactivate();
-            }
+            deactivate();
         }
     }
 }
