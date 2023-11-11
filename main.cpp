@@ -57,8 +57,8 @@ const char  FONT_FILEPATH[] = "assets/images/font1.png";
 
 const float MILLISECONDS_IN_SECOND = 1000.0;
 
-const std::string DEATH_MESSAGE = "YOU LOST! BETTER LUCK NEXT TIME!",
-                  WIN_MESSAGE   = "CONGRATS! YOU POPPED THEM ALL!!";
+const std::string DEATH_MESSAGE = "YOU LOSE! BETTER LUCK NEXT TIME!",
+                  WIN_MESSAGE   = "YOU WIN!! YOU POPPED THEM ALL!!";
 
 // ————— GLOBAL VARIABLES ————— //
 Scene*  g_current_scene;

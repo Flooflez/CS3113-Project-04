@@ -8,7 +8,7 @@
 * Academic Misconduct.
 *
 * Original File created by Sebastián Romero Cruz,
-* See information below
+* see information below.
 **/
 
 

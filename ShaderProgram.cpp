@@ -7,7 +7,8 @@
 * NYU School of Engineering Policies and Procedures on
 * Academic Misconduct.
 *
-* Original File created by Sebastián Romero Cruz
+* Original File created by Sebastián Romero Cruz,
+* see information below.
 **/
 
 //

@@ -193,6 +193,7 @@ void Entity::ai_jump(Entity* player, float delta_time)
     }
     else if (m_collided_bottom) {
         m_movement = glm::vec3(0.0f);
+        m_animation_index = 0;
     }
 }
 
