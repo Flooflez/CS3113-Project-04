@@ -78,13 +78,14 @@ void Entity::draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint textu
 
 void Entity::activate() { 
     m_is_active = true; 
+    
+};
+void Entity::deactivate() { 
+    m_is_active = false; 
     if (m_projectile_pointer != nullptr) {
         delete m_projectile_pointer;
         m_projectile_pointer = nullptr;
     }
-};
-void Entity::deactivate() { 
-    m_is_active = false; 
 };
 
 void Entity::ai_activate(Entity* player, float delta_time)
@@ -119,7 +120,7 @@ void Entity::ai_float(Entity* player, float delta_time)
         if (glm::abs(m_position.x - player->get_position().x) < 0.5f) {
             m_ai_state = ATTACKING;
             m_movement = glm::vec3(0.0f);
-            m_attack_timer = 0.0f;
+            m_attack_timer = 2.0f;
             return;
         }
 
@@ -140,7 +141,7 @@ void Entity::ai_float(Entity* player, float delta_time)
         }
 
         m_attack_timer += delta_time;
-        if (m_attack_timer > 2.0f) {
+        if (m_attack_timer > 3.0f) {
             delete m_projectile_pointer;
             shoot_projectile(glm::normalize(player->get_position() - m_position), 1.0f, glm::vec3(0.25f), glm::vec3(0.25f));
             m_attack_timer = 0;
@@ -187,25 +188,21 @@ void Entity::ai_shoot(Entity* player, float delta_time)
 {
     switch (m_ai_state) {
     case IDLE:
-        if (glm::distance(m_position, player->get_position()) < 3.0f) m_ai_state = WALKING;
+        m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+        shoot_projectile(m_movement, 2.0f, glm::vec3(0.25f), glm::vec3(0.25f));
+        m_animation_indices = m_walking[LEFT];
+        m_ai_state = ATTACKING;
+        
         break;
-
-    case WALKING:
-        if (m_position.x > player->get_position().x) {
-            m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
-            m_animation_indices = m_walking[LEFT];
-        }
-        else {
-            m_movement = glm::vec3(1.0f, 0.0f, 0.0f);
-            m_animation_indices = m_walking[RIGHT];
-        }
-        break;
-
     case ATTACKING:
-        break;
-
-    default:
-        break;
+        m_attack_timer += delta_time;
+        if (m_attack_timer > 2.0f) {
+            delete m_projectile_pointer;
+            m_movement *= -1.0f;
+            shoot_projectile(m_movement, 2.0f, glm::vec3(0.25f), glm::vec3(0.25f));
+            m_animation_indices = m_walking[(int)((m_movement.x / 2.0f) + 0.5f)];
+            m_attack_timer = 0;
+        }
     }
 }
 
@@ -301,6 +298,14 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
                 m_base_velocity.y = m_jumping_power/2.0f; //mini jump when stomping
             }
         }
+
+        if (collidable_entity->m_projectile_pointer != nullptr) {
+
+            if (check_collision(collidable_entity->m_projectile_pointer))
+            {
+                deactivate();
+            }
+        }
     }
 }
 
@@ -313,6 +318,14 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
         if (check_collision(collidable_entity))
         {
             deactivate();
+        }
+
+        if (collidable_entity->m_projectile_pointer != nullptr) {
+
+            if (check_collision(collidable_entity->m_projectile_pointer))
+            {
+                deactivate();
+            }
         }
     }
 }

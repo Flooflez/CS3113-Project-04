@@ -112,10 +112,33 @@ void LevelA::initialise()
     m_state.enemies[1].set_movement(glm::vec3(0.0f));
     m_state.enemies[1].set_speed(2.0f);
     m_state.enemies[1].set_width(0.6f);
-    m_state.enemies[1].set_height(0.8f);
+    m_state.enemies[1].set_height(0.7f);
     m_state.enemies[1].set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
     m_state.enemies[1].m_jumping_power = 5.0f;
     
+    //enemy 3
+    m_state.enemies[2].m_walking[m_state.enemies[2].LEFT] = new int[4] { 1, 5, 9, 13 };
+    m_state.enemies[2].m_walking[m_state.enemies[2].RIGHT] = new int[4] { 3, 7, 11, 15 };
+    m_state.enemies[2].m_walking[m_state.enemies[2].UP] = new int[4] { 2, 6, 10, 14 };
+    m_state.enemies[2].m_walking[m_state.enemies[2].DOWN] = new int[4] { 0, 4, 8, 12 };
+    m_state.enemies[2].m_animation_indices = m_state.enemies[2].m_walking[m_state.enemies[2].RIGHT];  // start enemy looking left
+    m_state.enemies[2].m_animation_frames = 4;
+    m_state.enemies[2].m_animation_index = 0;
+    m_state.enemies[2].m_animation_time = 0.0f;
+    m_state.enemies[2].m_animation_cols = 4;
+    m_state.enemies[2].m_animation_rows = 4;
+
+    m_state.enemies[2].set_entity_type(ENEMY);
+    m_state.enemies[2].set_ai_type(SHOOTER);
+    m_state.enemies[2].set_ai_state(IDLE);
+    m_state.enemies[2].m_texture_id = Utility::load_texture("assets/images/shooter.png");
+    m_state.enemies[2].set_position(glm::vec3(7.0f, -1.1f, 0.0f));
+    m_state.enemies[2].set_movement(glm::vec3(0.0f));
+    m_state.enemies[2].set_speed(0.0f);
+    m_state.enemies[2].set_width(0.6f);
+    m_state.enemies[2].set_height(0.8f);
+    m_state.enemies[2].set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
+    m_state.enemies[2].m_projectile_texture_id = Utility::load_texture("assets/images/projectile.png");
     
     /**
      BGM and SFX
