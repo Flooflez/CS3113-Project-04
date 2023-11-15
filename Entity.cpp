@@ -202,7 +202,7 @@ void Entity::ai_shoot(Entity* player, float delta_time)
     switch (m_ai_state) {
     case IDLE:
         m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
-        shoot_projectile(m_movement, 2.0f, glm::vec3(0.25f), glm::vec3(0.25f));
+        shoot_projectile(m_movement, 3.0f, glm::vec3(0.25f), glm::vec3(0.25f));
         m_animation_indices = m_walking[LEFT];
         m_ai_state = ATTACKING;
         
@@ -212,7 +212,7 @@ void Entity::ai_shoot(Entity* player, float delta_time)
         if (m_attack_timer > 2.0f) {
             delete m_projectile_pointer;
             m_movement *= -1.0f;
-            shoot_projectile(m_movement, 2.0f, glm::vec3(0.25f), glm::vec3(0.25f));
+            shoot_projectile(m_movement, 3.0f, glm::vec3(0.25f), glm::vec3(0.25f));
             m_animation_indices = m_walking[(int)((m_movement.x / 2.0f) + 0.5f)];
             m_attack_timer = 0;
         }
