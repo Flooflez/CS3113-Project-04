@@ -412,13 +412,13 @@ void const Entity::check_collision_x(Map* map)
 
     if (map->is_solid(left, &penetration_x, &penetration_y) && m_velocity.x < 0)
     {
-        m_position.x += penetration_x;
+        m_position.x += penetration_x + 0.01f;
         m_base_velocity.x = 0;
         m_collided_left = true;
     }
     if (map->is_solid(right, &penetration_x, &penetration_y) && m_velocity.x > 0)
     {
-        m_position.x -= penetration_x;
+        m_position.x -= penetration_x + 0.01f;
         m_base_velocity.x = 0;
         m_collided_right = true;
     }
